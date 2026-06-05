@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>实验项目展示</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f0f1a;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── 导航栏 ── */
+  .navbar {
+    background: #141428;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .navbar .logo { font-size: 1.1rem; font-weight: 700; color: #ffcc00; text-decoration: none; }
+  .navbar .nav-links { display: flex; gap: 4px; }
+  .navbar .nav-links a {
+    color: #999; text-decoration: none; padding: 8px 16px;
+    border-radius: 8px; font-size: 0.9rem; transition: all 0.2s;
+  }
+  .navbar .nav-links a:hover,
+  .navbar .nav-links a.active { color: #fff; background: rgba(255,255,255,0.08); }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 30px 20px 50px; }
+
+  .page-header { text-align: center; padding: 30px 0; }
+  .page-header h1 { font-size: 2rem; color: #ffcc00; margin-bottom: 4px; }
+  .page-header p { color: #777; font-size: 0.9rem; }
+
+  /* ── 实验卡片 ── */
+  .exp-card {
+    background: #1a1a2e;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .exp-card:hover { border-color: rgba(255,255,255,0.1); }
+
+  .exp-header {
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .exp-header .left { display: flex; align-items: center; gap: 14px; }
+  .exp-header .icon { font-size: 1.6rem; }
+  .exp-header .info h3 { font-size: 1rem; color: #fff; }
+  .exp-header .info .meta { font-size: 0.75rem; color: #666; margin-top: 2px; }
+  .exp-header .arrow {
+    color: #555; font-size: 1.2rem; transition: transform 0.3s;
+  }
+  .exp-card.open .arrow { transform: rotate(90deg); }
+  .exp-card.open { border-color: rgba(255,204,0,0.2); }
+
+  .exp-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+  .exp-card.open .exp-body { max-height: 800px; }
+
+  .exp-content {
+    padding: 0 22px 22px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    margin: 0 22px;
+  }
+  .exp-content h4 {
+    color: #ffcc00; font-size: 0.85rem; margin: 14px 0 6px;
+  }
+  .exp-content p, .exp-content li {
+    color: #aaa; font-size: 0.85rem; line-height: 1.7;
+  }
+  .exp-content ul { padding-left: 18px; }
+  .exp-content li { margin-bottom: 3px; }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    margin-right: 6px;
+    background: #333;
+    color: #aaa;
+  }
+  .tag.hardware { background: #1a3a2a; color: #00cc66; }
+  .tag.software { background: #1a2a3a; color: #4488ff; }
+  .tag.iot { background: #3a2a1a; color: #ffaa44; }
+
+  .footer {
+    text-align: center; padding: 30px 20px; color: #555;
+    font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.04);
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">⚗️ 化工控制学习站</a>
+  <div class="nav-links">
+    <a href="index.html">首页</a>
+    <a href="device.html">装置说明书</a>
+    <a href="experiments.html" class="active">实验项目</a>
+    <a href="game.html">休闲一下</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="page-header">
+    <h1>🧪 实验项目展示</h1>
+    <p>化工自动化 · 嵌入式系统 · 物联网应用</p>
+  </div>
+
+  <!-- 实验 1 -->
+  <div class="exp-card" onclick="toggleCard(this)">
+    <div class="exp-header">
+      <div class="left">
+        <div class="icon">🌡️</div>
+        <div class="info">
+          <h3>实验一：温度传感器数据采集与 OLED 显示</h3>
+          <div class="meta">
+            <span class="tag hardware">硬件</span>
+            <span class="tag software">嵌入式</span>
+            2025 春 · PCT-100 平台
+          </div>
+        </div>
+      </div>
+      <div class="arrow">▶</div>
+    </div>
+    <div class="exp-body">
+      <div class="exp-content">
+        <h4>实验目的</h4>
+        <p>掌握数字温度传感器的数据读取方法，理解 I²C 通信协议，实现温度数据的 OLED 实时显示。</p>
+        <h4>实验器材</h4>
+        <ul>
+          <li>PCT-100 化工控制实训装置</li>
+          <li>ESP32-03 主控模块</li>
+          <li>DS18B20 数字温度传感器</li>
+          <li>0.96 寸 OLED 显示屏（128×64）</li>
+        </ul>
+        <h4>实验步骤</h4>
+        <ul>
+          <li>① 连线：温度传感器 VCC → 3.3V，GND → GND，DATA → GPIO4</li>
+          <li>② 配置 I²C 总线，初始化 OLED 屏幕</li>
+          <li>③ 编写温度读取函数，每 500ms 采样一次</li>
+          <li>④ 将温度值格式化输出到 OLED 屏幕</li>
+          <li>⑤ 用手触摸传感器观察温度变化，记录数据</li>
+        </ul>
+        <h4>实验数据（示例）</h4>
+        <p>室温 25.3°C → 手指触摸后 31.7°C → 放置冰袋 12.8°C</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 实验 2 -->
+  <div class="exp-card" onclick="toggleCard(this)">
+    <div class="exp-header">
+      <div class="left">
+        <div class="icon">☀️</div>
+        <div class="info">
+          <h3>实验二：光照强度检测与自动报警</h3>
+          <div class="meta">
+            <span class="tag hardware">硬件</span>
+            <span class="tag iot">物联网</span>
+            2025 春 · PCT-100 平台
+          </div>
+        </div>
+      </div>
+      <div class="arrow">▶</div>
+    </div>
+    <div class="exp-body">
+      <div class="exp-content">
+        <h4>实验目的</h4>
+        <p>学习光照传感器的使用，实现光照强度阈值判断与自动报警触发机制。</p>
+        <h4>实验器材</h4>
+        <ul><li>PCT-100 装置 · BH1750 光照传感器 · LED 报警指示灯 · 蜂鸣器</li></ul>
+        <h4>实验步骤</h4>
+        <ul>
+          <li>① 连接 BH1750 光照传感器到 I²C 总线</li>
+          <li>② 配置传感器为连续高分辨率模式</li>
+          <li>③ 设置报警阈值：光照 > 900 lux 触发高报警</li>
+          <li>④ 用手电筒照射传感器，观察 LED 灯和蜂鸣器反应</li>
+          <li>⑤ 通过 MQTTs 远程读取光照数据并记录</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 实验 3 -->
+  <div class="exp-card" onclick="toggleCard(this)">
+    <div class="exp-header">
+      <div class="left">
+        <div class="icon">📡</div>
+        <div class="info">
+          <h3>实验三：MQTTs 远程监控与控制</h3>
+          <div class="meta">
+            <span class="tag iot">物联网</span>
+            <span class="tag software">通信</span>
+            2025 春 · PCT-100 平台
+          </div>
+        </div>
+      </div>
+      <div class="arrow">▶</div>
+    </div>
+    <div class="exp-body">
+      <div class="exp-content">
+        <h4>实验目的</h4>
+        <p>掌握 MQTTs 协议原理，实现 ESP32 通过加密 MQTT 与服务器通信，完成远程数据上报与指令下发。</p>
+        <h4>实验器材</h4>
+        <ul><li>PCT-100 装置 · ESP32-03 WiFi 模块 · MQTT Broker（如 EMQX）· MQTTX 客户端</li></ul>
+        <h4>实验步骤</h4>
+        <ul>
+          <li>① 配置 WiFi 连接，获取 IP 地址</li>
+          <li>② 配置 MQTTs 客户端证书（TLS 加密）</li>
+          <li>③ 连接 MQTT Broker，订阅控制主题 <code>/pct100/control</code></li>
+          <li>④ 定时发布传感器数据到 <code>/pct100/data</code></li>
+          <li>⑤ 使用 MQTTX 客户端发送开关指令，观察装置响应</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 实验 4 -->
+  <div class="exp-card" onclick="toggleCard(this)">
+    <div class="exp-header">
+      <div class="left">
+        <div class="icon">🔌</div>
+        <div class="info">
+          <h3>实验四：GPIO 引脚控制与执行器驱动</h3>
+          <div class="meta">
+            <span class="tag hardware">硬件</span>
+            <span class="tag software">驱动</span>
+            2025 春 · PCT-100 平台
+          </div>
+        </div>
+      </div>
+      <div class="arrow">▶</div>
+    </div>
+    <div class="exp-body">
+      <div class="exp-content">
+        <h4>实验目的</h4>
+        <p>掌握 ESP32 GPIO 引脚配置方法，实现风扇、LED 灯等执行器的程序控制。</p>
+        <h4>实验器材</h4>
+        <ul><li>PCT-100 装置 · 散热风扇 · LED 照明灯 · 继电器模块</li></ul>
+        <h4>实验步骤</h4>
+        <ul>
+          <li>① 配置 GPIO 引脚模式（输出模式）</li>
+          <li>② 风扇控制：GPIO16 → 继电器 → 风扇（PWM 调速）</li>
+          <li>③ 灯光控制：GPIO17 → 继电器 → LED 灯（开关）</li>
+          <li>④ 总闸控制：GPIO15 → 主继电器（控制整体供电）</li>
+          <li>⑤ 编写互锁逻辑：总闸断开时，风扇和灯无法开启</li>
+          <li>⑥ 测试本地按键与 MQTT 远程控制的优先级</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p style="margin-bottom:8px;">📧 <strong>联系我们</strong>：<a href="mailto:981060226@qq.com" style="color:#ffcc00;">981060226@qq.com</a></p>
+  <p style="color:#555;">💛 赞助支持 · 合作交流 · 欢迎联系</p>
+  <p style="margin-top:8px;">© 2025 化工控制技术学习站 · Powered by GitHub Pages</p>
+</div>
+
+<script>
+function toggleCard(card) {
+  card.classList.toggle('open');
+}
+</script>
+
+</body>
+</html>

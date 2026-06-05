@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCT-100 化工控制实训装置说明书</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f0f1a;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── 导航栏 ── */
+  .navbar {
+    background: #141428;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+  .navbar .logo { font-size: 1.1rem; font-weight: 700; color: #ffcc00; text-decoration: none; }
+  .navbar .nav-links { display: flex; gap: 4px; }
+  .navbar .nav-links a {
+    color: #999; text-decoration: none; padding: 8px 16px;
+    border-radius: 8px; font-size: 0.9rem; transition: all 0.2s;
+  }
+  .navbar .nav-links a:hover,
+  .navbar .nav-links a.active { color: #fff; background: rgba(255,255,255,0.08); }
+
+  /* ── 容器 ── */
+  .container { max-width: 1000px; margin: 0 auto; padding: 30px 20px 50px; }
+
+  /* ── 页头 ── */
+  .page-header {
+    text-align: center; padding: 30px 0 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 30px;
+  }
+  .page-header h1 { font-size: 2rem; color: #ffcc00; margin-bottom: 4px; }
+  .page-header .subtitle { color: #777; font-size: 0.9rem; }
+
+  /* ── Section 标题 ── */
+  .section-title {
+    font-size: 1.2rem; color: #ffcc00;
+    margin: 32px 0 16px; padding-left: 14px;
+    border-left: 3px solid #ffcc00;
+  }
+
+  /* ── 卡片通用 ── */
+  .card {
+    background: #1a1a2e;
+    border-radius: 14px;
+    padding: 24px;
+    border: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 20px;
+  }
+  .card h3 { font-size: 1rem; color: #ffcc00; margin-bottom: 10px; }
+
+  /* ── 概览卡片 ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 700px) { .overview-grid { grid-template-columns: 1fr; } }
+
+  .device-img {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .spec-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .spec-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .spec-table td:first-child { color: #888; width: 100px; white-space: nowrap; }
+  .spec-table td:last-child { color: #ddd; }
+
+  /* ── 数据仪表盘 ── */
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .meter-card {
+    background: #1a1a2e;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .meter-card .label { font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+  .meter-card .value { font-size: 2.2rem; font-weight: 700; margin: 6px 0; }
+  .meter-card .unit { font-size: 0.8rem; color: #888; }
+  .meter-card.temp .value { color: #ff8844; }
+  .meter-card.light .value { color: #ffcc00; }
+  .meter-card .bar-bg {
+    height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px;
+    margin-top: 10px; overflow: hidden;
+  }
+  .meter-card .bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+  .meter-card.temp .bar-fill { background: linear-gradient(90deg, #44aaff, #ff4444); }
+  .meter-card.light .bar-fill { background: linear-gradient(90deg, #664400, #ffcc00); }
+
+  /* ── OLED 屏幕 ── */
+  .oled-screen {
+    background: #000;
+    border: 3px solid #333;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 380px;
+    padding: 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #00ff88;
+    line-height: 1.6;
+    margin: 0 auto;
+  }
+  .oled-screen .line { display: flex; justify-content: space-between; }
+  .oled-screen .blink { animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .oled-page { transition: opacity 0.4s; }
+  .oled-page.hidden { display: none; }
+  .oled-dots { margin-top: 8px; }
+  .oled-dots .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #333; margin: 0 3px; transition: background 0.3s; }
+  .oled-dots .dot.active { background: #00ff88; }
+
+  /* ── 照片画廊 ── */
+  .photo-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .photo-gallery img { width: 100%; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: transform 0.2s; }
+  .photo-gallery img:hover { transform: scale(1.02); }
+
+  /* 灯箱 */
+  .lightbox { display: none; position: fixed; top:0;left:0;width:100%;height:100%; background: rgba(0,0,0,0.9); z-index: 999; justify-content: center; align-items: center; }
+  .lightbox.show { display: flex; }
+  .lightbox img { max-width: 90%; max-height: 85%; border-radius: 8px; }
+  .lightbox .close { position: absolute; top:20px;right:30px; color:#fff; font-size:2rem; cursor: pointer; }
+
+  /* ── 控制面板 ── */
+  .controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+  }
+  .switch-card {
+    background: #1a1a2e;
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    border: 2px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    transition: all 0.3s;
+    user-select: none;
+  }
+  .switch-card:hover { border-color: rgba(255,255,255,0.15); }
+  .switch-card.on {
+    border-color: #00cc66 !important;
+    box-shadow: 0 0 20px rgba(0,204,102,0.15);
+  }
+  .switch-card .sw-icon { font-size: 2rem; margin-bottom: 8px; }
+  .switch-card .sw-label { font-size: 0.85rem; color: #aaa; }
+  .switch-card .sw-status {
+    font-size: 0.75rem; margin-top: 6px;
+    padding: 3px 12px; border-radius: 20px; display: inline-block;
+  }
+  .switch-card .sw-status.off { background: #333; color: #888; }
+  .switch-card .sw-status.on  { background: #00cc6633; color: #00cc66; }
+
+  /* 总闸特殊样式 */
+  .switch-card.master.on {
+    border-color: #ffcc00 !important;
+    box-shadow: 0 0 24px rgba(255,204,0,0.2);
+  }
+  .switch-card.master .sw-status.on { background: #ffcc0033; color: #ffcc00; }
+
+  /* ── 状态指示器 ── */
+  .indicator-row {
+    display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
+    margin-top: 16px;
+  }
+  .indicator {
+    display: flex; align-items: center; gap: 8px; font-size: 0.85rem;
+  }
+  .indicator .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #444; transition: background 0.3s;
+  }
+  .indicator .dot.active { background: #00cc66; box-shadow: 0 0 8px #00cc66; }
+  .indicator .dot.warn { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
+
+  /* ── PDF 嵌入 ── */
+  .pdf-container {
+    border-radius: 12px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #111;
+  }
+  .pdf-container iframe {
+    width: 100%; height: 500px; border: none;
+  }
+
+  /* ── 底部 ── */
+  .footer {
+    text-align: center; padding: 30px 20px; color: #555;
+    font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.04);
+  }
+</style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="navbar">
+  <a href="index.html" class="logo">⚗️ 化工控制学习站</a>
+  <div class="nav-links">
+    <a href="index.html">首页</a>
+    <a href="device.html" class="active">装置说明书</a>
+    <a href="experiments.html">实验项目</a>
+    <a href="game.html">休闲一下</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- 页头 -->
+  <div class="page-header">
+    <h1>PCT-100 化工控制实训装置</h1>
+    <p class="subtitle">基于 ESP32-03 · WiFi / MQTTs 通信 · 本地按键控制 · 智能报警系统</p>
+  </div>
+
+  <!-- ════ 产品概览 ════ -->
+  <div class="section-title">📋 产品概览</div>
+  <div class="overview-grid">
+    <div class="card" style="margin-bottom:0">
+      <h3>装置简介</h3>
+      <p style="color:#aaa; font-size:0.9rem; line-height:1.7;">
+        PCT-100 是一款集<strong style="color:#ffcc00;">温度检测、光照检测、OLED 显示、智能报警</strong>
+        于一体的化工控制实训装置。装置采用 <strong style="color:#ffcc00;">ESP32-03 WiFi 模块</strong>
+        作为主控芯片，支持 <strong style="color:#ffcc00;">本地按键</strong> 与 <strong style="color:#ffcc00;">MQTTs 远程控制</strong>
+        两种操作方式，适用于化工自动化、嵌入式系统等课程的实训教学。
+      </p>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <img src="images/15.jpg" alt="PCT-100 装置" class="device-img"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div style="display:none;height:180px;align-items:center;justify-content:center;color:#555;font-size:0.85rem;">
+        📷 图片加载中...
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 技术规格 ════ -->
+  <div class="section-title">📐 技术规格</div>
+  <div class="card">
+    <table class="spec-table">
+      <tr><td>产品型号</td><td>PCT-100</td></tr>
+      <tr><td>主控芯片</td><td>ESP32-03（双核 Xtensa LX6，240 MHz）</td></tr>
+      <tr><td>WiFi 模块</td><td>集成 2.4 GHz WiFi（802.11 b/g/n）</td></tr>
+      <tr><td>通信协议</td><td>MQTTs（TLS 加密） / 本地按键</td></tr>
+      <tr><td>传感器</td><td>数字温度传感器 · 光照强度传感器</td></tr>
+      <tr><td>显示</td><td>OLED 屏幕（128×64）</td></tr>
+      <tr><td>执行器</td><td>散热风扇 · LED 照明灯 · 总闸开关</td></tr>
+      <tr><td>报警方式</td><td>蜂鸣器 + LED 闪烁</td></tr>
+      <tr><td>工作电压</td><td>DC 5V / USB Type-C 供电</td></tr>
+      <tr><td>工作温度</td><td>-10°C ~ 60°C</td></tr>
+    </table>
+  </div>
+
+  <!-- ════ 实时数据监测 ════ -->
+  <div class="section-title">📊 实时数据监测</div>
+  <div class="dashboard">
+    <div class="meter-card temp">
+      <div class="label">🌡️ 温度</div>
+      <div class="value" id="tempValue">--</div>
+      <div class="unit">°C</div>
+      <div class="bar-bg"><div class="bar-fill" id="tempBar" style="width:0%"></div></div>
+      <div style="margin-top:6px;font-size:0.7rem;color:#666;">正常范围 20~40°C</div>
+    </div>
+    <div class="meter-card light">
+      <div class="label">☀️ 光照强度</div>
+      <div class="value" id="lightValue">--</div>
+      <div class="unit">lux</div>
+      <div class="bar-bg"><div class="bar-fill" id="lightBar" style="width:0%"></div></div>
+      <div style="margin-top:6px;font-size:0.7rem;color:#666;">范围 0~1000 lux</div>
+    </div>
+  </div>
+
+  <!-- ════ OLED 屏幕模拟 ════ -->
+  <div class="section-title">🖥️ OLED 屏幕模拟</div>
+  <div class="card" style="text-align:center;">
+    <div class="oled-screen" id="oledScreen">
+      <!-- 第1页：传感器数据 -->
+      <div class="oled-page" id="oledPage1">
+        <div style="text-align:center;font-size:0.7rem;color:#00aa66;margin-bottom:6px;">══ SENSOR DATA ══</div>
+        <div class="line"><span>TEMP:</span><span id="oledTemp">25.4°C</span></div>
+        <div class="line"><span>LIGHT:</span><span id="oledLight">512 lux</span></div>
+        <div class="line"><span>FAN:</span><span id="oledFan">OFF</span></div>
+        <div class="line"><span>ALARM:</span><span id="oledAlarm" style="color:#00ff88;">● OK</span></div>
+      </div>
+      <!-- 第2页：系统状态 -->
+      <div class="oled-page hidden" id="oledPage2">
+        <div style="text-align:center;font-size:0.7rem;color:#00aa66;margin-bottom:6px;">══ SYS STATUS ══</div>
+        <div class="line"><span>WiFi:</span><span style="color:#00ff88;">● ON</span></div>
+        <div class="line"><span>MQTT:</span><span style="color:#00ff88;">● CONN</span></div>
+        <div class="line"><span>IP:</span><span>192.168.1.100</span></div>
+        <div class="line"><span>TLS:</span><span style="color:#00ff88;">● OK</span></div>
+      </div>
+      <div class="oled-dots">
+        <span class="dot active" id="oledDot1"></span>
+        <span class="dot" id="oledDot2"></span>
+      </div>
+    </div>
+    <p style="color:#555;font-size:0.75rem;margin-top:10px;">▲ 模拟装置 OLED 双页滚动显示效果</p>
+  </div>
+
+  <!-- ════ 控制面板 ════ -->
+  <div class="section-title">🎮 控制面板</div>
+  <div class="card">
+    <p style="color:#888;font-size:0.85rem;margin-bottom:16px;">点击开关切换状态（模拟控制演示）</p>
+    <div class="controls-grid">
+      <!-- 总闸 -->
+      <div class="switch-card master" id="swMaster" onclick="toggleSwitch('master')">
+        <div class="sw-icon">⚡</div>
+        <div class="sw-label">总闸电源</div>
+        <div class="sw-status off" id="statusMaster">关</div>
+      </div>
+      <!-- 风扇 -->
+      <div class="switch-card" id="swFan" onclick="toggleSwitch('fan')">
+        <div class="sw-icon">🌀</div>
+        <div class="sw-label">散热风扇</div>
+        <div class="sw-status off" id="statusFan">关</div>
+      </div>
+      <!-- 照明灯 -->
+      <div class="switch-card" id="swLight" onclick="toggleSwitch('light')">
+        <div class="sw-icon">💡</div>
+        <div class="sw-label">照明灯光</div>
+        <div class="sw-status off" id="statusLight">关</div>
+      </div>
+      <!-- 报警 -->
+      <div class="switch-card" id="swAlarm" onclick="toggleSwitch('alarm')">
+        <div class="sw-icon">🚨</div>
+        <div class="sw-label">报警系统</div>
+        <div class="sw-status off" id="statusAlarm">关</div>
+      </div>
+    </div>
+
+    <!-- 状态指示灯 -->
+    <div class="indicator-row">
+      <div class="indicator"><div class="dot" id="dotMaster"></div>总闸</div>
+      <div class="indicator"><div class="dot" id="dotFan"></div>风扇</div>
+      <div class="indicator"><div class="dot" id="dotLight"></div>灯光</div>
+      <div class="indicator"><div class="dot" id="dotAlarm"></div>报警</div>
+      <span style="color:#666;font-size:0.75rem;margin-left:10px;">
+        连接状态：<span style="color:#00cc66;" id="mqttStatus">MQTTs 已连接</span>
+      </span>
+    </div>
+
+    <!-- 报警触发时 -->
+    <div id="alarmBanner" style="display:none;margin-top:14px;padding:10px 16px;background:#ff444422;border:1px solid #ff444444;border-radius:8px;color:#ff6666;font-size:0.85rem;">
+      ⚠️ 报警！温度或光照超出阈值范围！
+    </div>
+  </div>
+
+  <!-- ════ 装置实拍 ════ -->
+  <div class="section-title">📸 装置实拍</div>
+  <div class="photo-gallery">
+    <img src="images/微信图片_20260605091855_33_3.jpg" alt="PCT-100 实拍1" onclick="openLightbox(this.src)">
+    <img src="images/微信图片_20260605091856_34_3.jpg" alt="PCT-100 实拍2" onclick="openLightbox(this.src)">
+  </div>
+  <p style="color:#555;font-size:0.75rem;margin:8px 0 20px;">💡 点击图片可放大查看</p>
+
+  <!-- 灯箱 -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <span class="close">&times;</span>
+    <img id="lightboxImg" src="" alt="放大查看">
+  </div>
+
+  <!-- ════ 引脚图 ════ -->
+  <div class="section-title">📌 引脚接线图</div>
+  <div class="card">
+    <div class="pdf-container">
+      <iframe src="images/PCT-100_SCH_V1.0.pdf" title="PCT-100 引脚图"></iframe>
+    </div>
+    <p style="color:#666;font-size:0.75rem;margin-top:10px;">
+      📎 <a href="images/PCT-100_SCH_V1.0.pdf" download style="color:#ffcc00;">下载 PDF 原文件</a>
+    </p>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p style="margin-bottom:8px;">📧 <strong>联系我们</strong>：<a href="mailto:981060226@qq.com" style="color:#ffcc00;">981060226@qq.com</a></p>
+  <p style="color:#555;">💛 赞助支持 · 合作交流 · 欢迎联系</p>
+  <p style="margin-top:8px;">© 2025 化工控制技术学习站 · Powered by GitHub Pages</p>
+</div>
+
+<!-- ════ 交互脚本 ════ -->
+<script>
+// ── 开关状态 ──
+const switches = {
+  master: false,
+  fan: false,
+  light: false,
+  alarm: false
+};
+
+function toggleSwitch(type) {
+  // 总闸关闭时，其他开关不能操作
+  if (type !== 'master' && !switches.master) {
+    alert('请先打开总闸电源！');
+    return;
+  }
+  // 关闭总闸时，全部关闭
+  if (type === 'master') {
+    switches.master = !switches.master;
+    if (!switches.master) {
+      switches.fan = false;
+      switches.light = false;
+      switches.alarm = false;
+      updateSwitchUI('fan');
+      updateSwitchUI('light');
+      updateSwitchUI('alarm');
+    }
+  } else {
+    switches[type] = !switches[type];
+  }
+
+  updateSwitchUI(type);
+  updateIndicators();
+  updateOLED();
+}
+
+function updateSwitchUI(type) {
+  const el = document.getElementById('sw' + type.charAt(0).toUpperCase() + type.slice(1));
+  const status = document.getElementById('status' + type.charAt(0).toUpperCase() + type.slice(1));
+  const on = switches[type];
+
+  if (on) {
+    el.classList.add('on');
+    status.textContent = '开';
+    status.className = 'sw-status on';
+  } else {
+    el.classList.remove('on');
+    status.textContent = '关';
+    status.className = 'sw-status off';
+  }
+}
+
+function updateIndicators() {
+  document.getElementById('dotMaster').className = 'dot' + (switches.master ? ' active' : '');
+  document.getElementById('dotFan').className = 'dot' + (switches.fan ? ' active' : '');
+  document.getElementById('dotLight').className = 'dot' + (switches.light ? ' active' : '');
+
+  // 报警指示（由数据触发，但也可手动）
+  const alarmEl = document.getElementById('dotAlarm');
+  const isAlarm = isTempAlarm() || isLightAlarm();
+  alarmEl.className = 'dot' + (switches.alarm && isAlarm ? ' warn' : switches.alarm ? ' active' : '');
+
+  // 报警横幅
+  document.getElementById('alarmBanner').style.display =
+    (switches.alarm && isAlarm) ? 'block' : 'none';
+}
+
+// ── 模拟数据 ──
+let simTemp = 27.5;
+let simLight = 480;
+
+function isTempAlarm() { return simTemp > 38 || simTemp < 5; }
+function isLightAlarm() { return simLight > 900; }
+
+function updateMeters() {
+  // 温度波动
+  simTemp += (Math.random() - 0.5) * 0.6;
+  simTemp = Math.round(Math.max(22, Math.min(42, simTemp)) * 10) / 10;
+
+  // 光照波动
+  simLight += (Math.random() - 0.5) * 30;
+  simLight = Math.round(Math.max(50, Math.min(980, simLight)));
+
+  // 温度条 (20~45°C -> 0~100%)
+  const tempPct = Math.max(0, Math.min(100, ((simTemp - 20) / 25) * 100));
+  document.getElementById('tempValue').textContent = simTemp.toFixed(1);
+  document.getElementById('tempBar').style.width = tempPct + '%';
+
+  // 光照条
+  const lightPct = Math.max(0, Math.min(100, (simLight / 1000) * 100));
+  document.getElementById('lightValue').textContent = simLight;
+  document.getElementById('lightBar').style.width = lightPct + '%';
+
+  updateIndicators();
+  updateOLED();
+}
+
+function updateOLED() {
+  document.getElementById('oledTemp').textContent = simTemp.toFixed(1) + '°C';
+  document.getElementById('oledLight').textContent = simLight + ' lux';
+  document.getElementById('oledFan').textContent = switches.fan ? 'ON ' : 'OFF';
+  const alarmEl = document.getElementById('oledAlarm');
+  if (isTempAlarm() || isLightAlarm()) {
+    alarmEl.textContent = '⚠ WARN';
+    alarmEl.style.color = '#ff4444';
+  } else {
+    alarmEl.textContent = '● OK';
+    alarmEl.style.color = '#00ff88';
+  }
+}
+
+// ── OLED 双页滚动 ──
+let oledPage = 1;
+function flipOledPage() {
+  const page1 = document.getElementById('oledPage1');
+  const page2 = document.getElementById('oledPage2');
+  const dot1 = document.getElementById('oledDot1');
+  const dot2 = document.getElementById('oledDot2');
+  if (oledPage === 1) {
+    page1.classList.add('hidden');
+    page2.classList.remove('hidden');
+    dot1.classList.remove('active');
+    dot2.classList.add('active');
+    oledPage = 2;
+  } else {
+    page2.classList.add('hidden');
+    page1.classList.remove('hidden');
+    dot2.classList.remove('active');
+    dot1.classList.add('active');
+    oledPage = 1;
+  }
+}
+setInterval(flipOledPage, 3000);
+
+// ── 灯箱 ──
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('show');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('show');
+}
+
+// ── 启动 ──
+updateMeters();
+setInterval(updateMeters, 1500);
+</script>
+
+</body>
+</html>
