@@ -112,29 +112,42 @@
   .meter-card.temp .bar-fill { background: linear-gradient(90deg, #44aaff, #ff4444); }
   .meter-card.light .bar-fill { background: linear-gradient(90deg, #664400, #ffcc00); }
 
-  /* ── OLED 屏幕 ── */
+  /* ── OLED 屏幕（仿真实装置蓝白OLED）── */
   .oled-screen {
-    background: #000;
-    border: 3px solid #333;
-    border-radius: 8px;
+    background: #020810;
+    border: 4px solid #1a1a2e;
+    border-radius: 10px;
     width: 100%;
     max-width: 380px;
-    padding: 16px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    color: #00ff88;
+    padding: 14px 18px;
+    font-family: 'Courier New', 'SimHei', monospace;
+    font-size: 0.82rem;
+    color: #aaddff;
     line-height: 1.6;
     margin: 0 auto;
+    letter-spacing: 0.5px;
+    box-shadow: inset 0 0 40px rgba(40,100,200,0.12);
   }
-  .oled-screen .line { display: flex; justify-content: space-between; }
-  .oled-screen .blink { animation: blink 1s infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
+  .oled-screen .line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1px;
+  }
+  .oled-screen .line .lbl { color: #88bbee; }
+  .oled-screen .line .val { color: #ffffff; }
+  .oled-on  { color: #66ddff; }
+  .oled-off { color: #335566; }
+  .oled-warn { color: #ff6666; }
 
   .oled-page { transition: opacity 0.4s; }
   .oled-page.hidden { display: none; }
-  .oled-dots { margin-top: 8px; }
-  .oled-dots .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #333; margin: 0 3px; transition: background 0.3s; }
-  .oled-dots .dot.active { background: #00ff88; }
+  .oled-dots { margin-top: 10px; text-align: center; }
+  .oled-dots .dot {
+    display: inline-block; width: 6px; height: 6px;
+    border-radius: 50%; background: #334466; margin: 0 3px;
+    transition: background 0.3s;
+  }
+  .oled-dots .dot.active { background: #aaddff; }
 
   /* ── 照片画廊 ── */
   .photo-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
@@ -281,16 +294,14 @@
     <div class="meter-card temp">
       <div class="label">🌡️ 温度</div>
       <div class="value" id="tempValue">--</div>
-      <div class="unit">°C</div>
+      <div class="unit">°C（阈值 32°C）</div>
       <div class="bar-bg"><div class="bar-fill" id="tempBar" style="width:0%"></div></div>
-      <div style="margin-top:6px;font-size:0.7rem;color:#666;">正常范围 20~40°C</div>
     </div>
     <div class="meter-card light">
       <div class="label">☀️ 光照强度</div>
       <div class="value" id="lightValue">--</div>
-      <div class="unit">lux</div>
+      <div class="unit">lux（阈值 260 lux）</div>
       <div class="bar-bg"><div class="bar-fill" id="lightBar" style="width:0%"></div></div>
-      <div style="margin-top:6px;font-size:0.7rem;color:#666;">范围 0~1000 lux</div>
     </div>
   </div>
 
@@ -298,28 +309,30 @@
   <div class="section-title">🖥️ OLED 屏幕模拟</div>
   <div class="card" style="text-align:center;">
     <div class="oled-screen" id="oledScreen">
-      <!-- 第1页：传感器数据 -->
+      <!-- 第1页：运行数据 -->
       <div class="oled-page" id="oledPage1">
-        <div style="text-align:center;font-size:0.7rem;color:#00aa66;margin-bottom:6px;">══ SENSOR DATA ══</div>
-        <div class="line"><span>TEMP:</span><span id="oledTemp">25.4°C</span></div>
-        <div class="line"><span>LIGHT:</span><span id="oledLight">512 lux</span></div>
-        <div class="line"><span>FAN:</span><span id="oledFan">OFF</span></div>
-        <div class="line"><span>ALARM:</span><span id="oledAlarm" style="color:#00ff88;">● OK</span></div>
+        <div class="line"><span class="lbl">模式：</span><span class="val" id="oledMode">自动</span></div>
+        <div class="line"><span class="lbl">总闸：</span><span class="val oled-on" id="oledMaster">开</span></div>
+        <div class="line"><span class="lbl">光照：</span><span class="val" id="oledLight">480/260lux</span></div>
+        <div class="line"><span class="lbl">温度：</span><span class="val" id="oledTemp">26.5/32°C</span></div>
+        <div class="line"><span class="lbl">灯光：</span><span class="val oled-off" id="oledLightSw">关</span></div>
+        <div class="line"><span class="lbl">风扇：</span><span class="val oled-off" id="oledFan">关</span></div>
       </div>
-      <!-- 第2页：系统状态 -->
+      <!-- 第2页：网络状态 -->
       <div class="oled-page hidden" id="oledPage2">
-        <div style="text-align:center;font-size:0.7rem;color:#00aa66;margin-bottom:6px;">══ SYS STATUS ══</div>
-        <div class="line"><span>WiFi:</span><span style="color:#00ff88;">● ON</span></div>
-        <div class="line"><span>MQTT:</span><span style="color:#00ff88;">● CONN</span></div>
-        <div class="line"><span>IP:</span><span>192.168.1.100</span></div>
-        <div class="line"><span>TLS:</span><span style="color:#00ff88;">● OK</span></div>
+        <div class="line"><span class="lbl">WiFi：</span><span class="val oled-on" id="oledWifi">● 已连接</span></div>
+        <div class="line"><span class="lbl">SSID：</span><span class="val" id="oledSsid">PCT100-Lab</span></div>
+        <div class="line"><span class="lbl">IP：</span><span class="val" id="oledIp">192.168.1.100</span></div>
+        <div class="line"><span class="lbl">MQTT：</span><span class="val oled-on" id="oledMqtt">● 已连接</span></div>
+        <div class="line"><span class="lbl"></span><span class="val" style="color:#335566;">--------</span></div>
+        <div class="line"><span class="lbl">模式：</span><span class="val" id="oledMode2">自动</span></div>
       </div>
       <div class="oled-dots">
         <span class="dot active" id="oledDot1"></span>
         <span class="dot" id="oledDot2"></span>
       </div>
     </div>
-    <p style="color:#555;font-size:0.75rem;margin-top:10px;">▲ 模拟装置 OLED 双页滚动显示效果</p>
+    <p style="color:#555;font-size:0.75rem;margin-top:10px;">▲ 模拟 PCT-100 装置 OLED 双页滚动显示效果</p>
   </div>
 
   <!-- ════ 控制面板 ════ -->
@@ -413,6 +426,10 @@ const switches = {
   alarm: false
 };
 
+// ── 阈值 ──
+const TEMP_THRESHOLD = 32;   // °C
+const LIGHT_THRESHOLD = 260; // lux
+
 function toggleSwitch(type) {
   // 总闸关闭时，其他开关不能操作
   if (type !== 'master' && !switches.master) {
@@ -460,31 +477,30 @@ function updateIndicators() {
   document.getElementById('dotFan').className = 'dot' + (switches.fan ? ' active' : '');
   document.getElementById('dotLight').className = 'dot' + (switches.light ? ' active' : '');
 
-  // 报警指示（由数据触发，但也可手动）
   const alarmEl = document.getElementById('dotAlarm');
   const isAlarm = isTempAlarm() || isLightAlarm();
   alarmEl.className = 'dot' + (switches.alarm && isAlarm ? ' warn' : switches.alarm ? ' active' : '');
 
-  // 报警横幅
   document.getElementById('alarmBanner').style.display =
     (switches.alarm && isAlarm) ? 'block' : 'none';
 }
 
 // ── 模拟数据 ──
-let simTemp = 27.5;
+let simTemp = 26.5;
 let simLight = 480;
+let simIp = '192.168.1.100';
 
-function isTempAlarm() { return simTemp > 38 || simTemp < 5; }
-function isLightAlarm() { return simLight > 900; }
+function isTempAlarm() { return simTemp > TEMP_THRESHOLD || simTemp < 5; }
+function isLightAlarm() { return simLight > LIGHT_THRESHOLD; }
 
 function updateMeters() {
   // 温度波动
   simTemp += (Math.random() - 0.5) * 0.6;
-  simTemp = Math.round(Math.max(22, Math.min(42, simTemp)) * 10) / 10;
+  simTemp = Math.round(Math.max(20, Math.min(45, simTemp)) * 10) / 10;
 
   // 光照波动
-  simLight += (Math.random() - 0.5) * 30;
-  simLight = Math.round(Math.max(50, Math.min(980, simLight)));
+  simLight += (Math.random() - 0.5) * 35;
+  simLight = Math.round(Math.max(30, Math.min(950, simLight)));
 
   // 温度条 (20~45°C -> 0~100%)
   const tempPct = Math.max(0, Math.min(100, ((simTemp - 20) / 25) * 100));
@@ -496,22 +512,63 @@ function updateMeters() {
   document.getElementById('lightValue').textContent = simLight;
   document.getElementById('lightBar').style.width = lightPct + '%';
 
+  // 模拟 IP 偶尔变化
+  if (Math.random() < 0.02) {
+    const lastOctet = Math.floor(Math.random() * 50) + 100;
+    simIp = '192.168.1.' + lastOctet;
+  }
+
   updateIndicators();
   updateOLED();
 }
 
+// ── OLED 更新（按真实装置内容）──
 function updateOLED() {
-  document.getElementById('oledTemp').textContent = simTemp.toFixed(1) + '°C';
-  document.getElementById('oledLight').textContent = simLight + ' lux';
-  document.getElementById('oledFan').textContent = switches.fan ? 'ON ' : 'OFF';
-  const alarmEl = document.getElementById('oledAlarm');
-  if (isTempAlarm() || isLightAlarm()) {
-    alarmEl.textContent = '⚠ WARN';
-    alarmEl.style.color = '#ff4444';
+  // === 第1页：运行数据 ===
+  // 模式（始终自动）
+  document.getElementById('oledMode').textContent = '自动';
+  document.getElementById('oledMode2').textContent = '自动';
+
+  // 总闸
+  const masterEl = document.getElementById('oledMaster');
+  if (switches.master) {
+    masterEl.textContent = '开';
+    masterEl.className = 'val oled-on';
   } else {
-    alarmEl.textContent = '● OK';
-    alarmEl.style.color = '#00ff88';
+    masterEl.textContent = '关';
+    masterEl.className = 'val oled-off';
   }
+
+  // 光照：当前值/阈值lux
+  const lightEl = document.getElementById('oledLight');
+  lightEl.textContent = simLight + '/' + LIGHT_THRESHOLD + 'lux';
+  lightEl.className = isLightAlarm() ? 'val oled-warn' : 'val';
+
+  // 温度：当前值/阈值°C
+  const tempEl = document.getElementById('oledTemp');
+  tempEl.textContent = simTemp.toFixed(1) + '/' + TEMP_THRESHOLD + '°C';
+  tempEl.className = isTempAlarm() ? 'val oled-warn' : 'val';
+
+  // 灯光开关
+  const lightSw = document.getElementById('oledLightSw');
+  lightSw.textContent = switches.light ? '开' : '关';
+  lightSw.className = switches.light ? 'val oled-on' : 'val oled-off';
+
+  // 风扇开关
+  const fanEl = document.getElementById('oledFan');
+  fanEl.textContent = switches.fan ? '开' : '关';
+  fanEl.className = switches.fan ? 'val oled-on' : 'val oled-off';
+
+  // === 第2页：网络状态 ===
+  const wifiEl = document.getElementById('oledWifi');
+  wifiEl.textContent = switches.master ? '● 已连接' : '○ 未连接';
+  wifiEl.className = switches.master ? 'val oled-on' : 'val oled-off';
+
+  document.getElementById('oledIp').textContent = simIp;
+
+  const mqttEl = document.getElementById('oledMqtt');
+  mqttEl.textContent = switches.master ? '● 已连接' : '○ 未连接';
+  mqttEl.className = switches.master ? 'val oled-on' : 'val oled-off';
 }
 
 // ── OLED 双页滚动 ──
